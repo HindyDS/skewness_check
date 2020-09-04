@@ -1,0 +1,81 @@
+def skew_check(df):
+  if len(df.columns)>=4:
+    fig, axes =plt.subplots(nrows=(math.ceil(len(df.columns)/4)),ncols=4, figsize=(30,10))
+    axes = axes.flatten()
+    for ax, i in zip(axes, df.columns):
+      sns.distplot(df[i],fit=norm, ax=ax)
+
+      # Get the fitted parameters used by the function
+      (mu, sigma) = norm.fit(df[i])
+      ax.legend(['Normal dist. ($\mu=$ {:.2f} and $\sigma=$ {:.2f} )'.format(mu, sigma)], loc='best')
+
+      #Now plot the distribution
+      ax.set_title('{0} distribution'.format(i))
+      ax.set_ylabel('Frequency') 
+
+    plt.show()
+
+  elif len(df.columns)==1:
+    for i in df.columns:
+      ax = sns.distplot(df[i],fit=norm)
+
+      # Get the fitted parameters used by the function
+      (mu, sigma) = norm.fit(df[i])
+      ax.legend(['Normal dist. ($\mu=$ {:.2f} and $\sigma=$ {:.2f} )'.format(mu, sigma)], loc='best')
+
+      #Now plot the distribution
+      ax.set_title('{0} distribution'.format(i))
+      ax.set_ylabel('Frequency') 
+
+    plt.show()
+
+  else:
+    fig, axes =plt.subplots(nrows=(math.ceil(len(df.columns)/4)),ncols=len(df.columns), figsize=(len(df.columns)*5,len(df.columns)*2))
+    axes = axes.flatten()
+    for ax, i in zip(axes, df.columns):
+      sns.distplot(df[i],fit=norm, ax=ax)
+
+      # Get the fitted parameters used by the function
+      (mu, sigma) = norm.fit(df[i])
+      ax.legend(['Normal dist. ($\mu=$ {:.2f} and $\sigma=$ {:.2f} )'.format(mu, sigma)], loc='best')
+
+      #Now plot the distribution
+      ax.set_title('{0} distribution'.format(i))
+      ax.set_ylabel('Frequency') 
+
+    plt.tight_layout()  
+    plt.show()
+
+
+  if len(df.columns)>=4:
+  #Get also the QQ-plot
+    fig, axes =plt.subplots(nrows=(math.ceil(len(df.columns)/4)),ncols=4, figsize=(30,10))
+    axes = axes.flatten()
+
+    for ax, i in zip(axes, df.columns):
+      res = stats.probplot(df[i].values.ravel(), plot=ax)
+      ax.set_title("Probplot for {0} ".format(i))
+    fig = plt.figure()
+
+  elif len(df.columns)==1:
+    for i in df.columns:
+      plt.figure()
+      stats.probplot(df[i], plot=plt)
+      plt.show()
+
+  else:
+  #Get also the QQ-plot
+    fig, axes =plt.subplots(nrows=(math.ceil(len(df.columns)/4)),ncols=len(df.columns), figsize=(len(df.columns)*5,len(df.columns)*2))
+    axes = axes.flatten()
+
+    for ax, i in zip(axes, df.columns):
+      res = stats.probplot(df[i].values.ravel(), plot=ax)
+      ax.set_title("Probplot for {0} ".format(i))
+    fig = plt.figure()
+
+
+  # Check the skew of all numerical features
+  skewed_feats = df.apply(lambda x: skew(x.dropna())).sort_values(ascending=False)
+  print("\nSkew in numerical features: \n")
+  skewness = pd.DataFrame({'Skew' :skewed_feats})
+  return skewness.head(10)
